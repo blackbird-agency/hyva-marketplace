@@ -10,6 +10,8 @@ This utility skill creates new Magento 2 modules in `app/code/`. It is designed 
 
 **Command execution:** For commands that need to run inside the development environment (e.g., `bin/magento`), use the `hyva-exec-shell-cmd` skill to detect the environment and determine the appropriate command wrapper.
 
+**Skill deps** (read via `<skill_path>/../{name}/SKILL.md`, where `<skill_path>` is the directory containing this SKILL.md file): `hyva-exec-shell-cmd`
+
 ## Parameters
 
 When invoking this skill, the calling skill should provide:
@@ -68,6 +70,12 @@ Use template `assets/templates/module.xml.tpl`:
 ### Step 4: Run Setup (Optional)
 
 If the calling skill requests it, run `bin/magento setup:upgrade` using the `hyva-exec-shell-cmd` skill for the appropriate wrapper.
+
+### Step 5: Register for Tailwind Compilation (Optional)
+
+Only when the user or the calling skill asked for the new module to ship its own Tailwind styles or config: register it for Tailwind compilation (optionally with the `hyva-register-module-tailwind` skill, if it is installed; without that skill, do not register it by hand and state in the final report that it is not registered). That skill adds the `hyva_config_generate_before` observer, the module's `view/frontend/tailwind/` files, and regenerates `app/etc/hyva-themes.json`.
+
+Do not do this, and do not ask about it, for a plain module scaffold.
 
 ## Error Handling
 
