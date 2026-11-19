@@ -8,7 +8,9 @@ requires: hyva-theme-list, hyva-compile-tailwind-css
 
 Adds a module path as a `{ "src": "<PATH>" }` entry to either the `tailwind.include` or `tailwind.exclude` array in a theme's `hyva.config.json`. This is the Hyvä 1.4+ / Tailwind v4 mechanism; Step 3 handles older setups.
 
-**Skill deps** (read via `<skill_path>/../{name}/SKILL.md`): `hyva-theme-list`, `hyva-compile-tailwind-css`
+**Skill deps** (read via `<skill_path>/../{name}/SKILL.md`, where `<skill_path>` is the directory containing this SKILL.md file): `hyva-theme-list`, `hyva-compile-tailwind-css`
+
+**Non-interactive runs:** Where a step says to ask the user and the user cannot be asked (subagent or non-interactive run), stop and report which input is missing. Do not guess, and do not edit files under `vendor/` without confirmation.
 
 ## Step 1: Determine the Target List
 
@@ -43,11 +45,14 @@ Use the current working directory as the project root. If a module name was prov
 
 ### For an exclude
 
-The exclude path must match the module's registered source path, which the build reads from `app/etc/hyva-themes.json` (a module can only be excluded if it is registered there).
+The exclude path must match the module's registered source path, which the build reads from `app/etc/hyva-themes.json` (a module can only be excluded if it is registered there). A module gets into that file through an observer on the `hyva_config_generate_before` event. Compatibility modules that use `CompatModuleRegistry` are registered automatically.
 
 - Read `app/etc/hyva-themes.json` and find the entry for the module, matching by its `Vendor_Module` name or by the provided path or directory name.
 - Use that entry's registered source path verbatim. It often ends in `/src` (e.g. `vendor/hyva-themes/magento2-hyva-checkout/src`).
-- If the module is not listed there, it is not imported by the build and cannot be excluded. Inform the user and stop.
+- If the module is not listed there, it is not imported by the build and cannot be excluded. Inform the user and stop. In the same message, tell the user:
+  - A module they want compiled has to be registered first.
+  - If `<skill_path>/../hyva-register-module-tailwind` exists, they can use that skill to register it. Name the skill.
+  - Compatibility modules that use `CompatModuleRegistry` are registered automatically.
 
 ### For an include
 
